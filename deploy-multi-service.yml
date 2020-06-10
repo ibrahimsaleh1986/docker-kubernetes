@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: db-deployment
+   labels:
+      app: myapp
+      type: database
+spec:
+   template:
+      metadata:
+        name: db-pod
+        labels:
+          app: myapp
+          type: mongo-db
+      spec:
+        containers:
+         - name: mongodb
+           image: mongo:latest
+           ports:
+             - containerPort: 27017
+              
+   replicas: 1
+   selector:
+      matchLabels:
+        app: myapp
+        type: mongo-db
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: mongo
+spec:
+   type: ClusterIP
+   ports:
+      - targetPort: 27017
+        port: 80
+   selector:
+      app: myapp
+      type: mongo-db
+      
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: order-api
+   labels:
+      app: myapp
+spec:
+  template:
+    metadata:
+      name: order-api-pod
+      labels:
+        app: myapp
+        type: rest-api
+    spec:
+      containers:
+      - name: backend-api
+        image: zqasem/orders-api:1.4
+        ports:
+        - containerPort: 10253
+  replicase:
+  selector:
+    matchLabels:
+      app: myapp
+      type: rest-api
+---      
+
+        
